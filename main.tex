@@ -1,0 +1,176 @@
+\documentclass[a4paper,14pt]{extarticle}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+
+\usepackage[newfloat]{minted}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{aliceblue}{rgb}{0.94, 0.97, 1.0}
+\usepackage{tikz-uml}
+\usepackage[normalem]{ulem}
+\usepackage{csquotes}
+
+
+\usepackage[right=15mm, left=25mm, top=15mm, bottom=20mm, nohead]{geometry}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{cmap}
+\usepackage{array}
+
+\renewcommand{\baselinestretch}{1.2}
+\newtheorem*{definition}{Опр}
+
+\DeclareMathOperator*{\VarInstr}{VarInstr}
+\DeclareMathOperator*{\offset}{offset}
+
+\usepackage{caption}
+%\newenvironment{code}{\captionsetup{type=listing}}{}
+\SetupFloatingEnvironment{listing}{name=Листинг}
+\newenvironment{longlisting}{\captionsetup{type=listing}}{}
+
+\usepackage{hyperref}
+\usepackage{indentfirst}
+
+\usepackage[
+	backend=biber, %подключение пакета biber (тоже нужен)
+	bibstyle=gost-numeric, %подключение одного из четырех главных стилей biblatex-gost 
+	citestyle=numeric-comp, %подключение стиля стиля (а вот!) 
+	language=auto, %указание сортировки языков
+	babel=other, %указание языков
+	sorting=ntvy, %тип сортировки в библиографии
+	doi=false, 
+	eprint=false, 
+	isbn=false, 
+	dashed=false, 
+	url=false 
+]{biblatex}
+\addbibresource{library.bib}
+\usepackage{bibentry}
+
+%\DeclareFieldFormat{postnote}{#1} %убирает с. и p. 
+%\renewcommand*{\multicitedelim}{\addsemicolon\space} % добавляет точку с запятой и пробел (; ) в перечислении
+%\renewcommand*{\postnotedelim}{\addcolon\space}
+
+
+\title{Эффективная генерация кода для платформы ARM32}
+\author{}
+\date{}
+
+\begin{document}
+	\begin{titlepage}
+	\begin{center}	
+		\footnotesize
+		МИНИСТЕРСТВО ОБРАЗОВАНИЯ И НАУКИ РОССИЙСКОЙ ФЕДЕРАЦИИ 
+		
+		ФЕДЕРАЛЬНОЕ ГОСУДАРСТВЕННОЕ АВТОНОМНОЕ ОБРАЗОВАТЕЛЬНОЕ УЧРЕЖДЕНИЕ
+		ВЫСШЕГО ОБРАЗОВАНИЯ
+		
+		«НОВОСИБИРСКИЙ НАЦИОНАЛЬНЫЙ ИССЛЕДОВАТЕЛЬСКИЙ ГОСУДАРСТВЕННЫЙ УНИВЕРСИТЕТ»
+		
+		(НОВОСИБИРСКИЙ ГОСУДАРСТВЕННЫЙ УНИВЕРСИТЕТ, НГУ)
+		\vspace{0.25cm}
+	\end{center}	
+	\normalsize
+	
+	\noindent
+	\begin{tabular}{l @{\hskip 1cm} l}
+		Факультет &Информационных технологий \\
+		Кафедра   &Систем информатики 
+	\end{tabular}
+	
+	\vspace{0.5cm}
+	
+	\noindent
+	\hskip 0.2cm Направление подготовки \hskip 0.3cm 09.03.01 Компьютерные науки и системотехника
+	
+	\vfill		
+	
+	\begin{center}
+		\small	
+		\textbf{ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА БАКАЛАВРА}\\[4mm]
+		\normalsize
+		\uline{\hfill  Мерзляков Илья Алексеевич \hfill} 
+		
+		
+		\normalsize
+		Тема работы: 
+		Разработка бэкенда LLVM для процессора CDM16
+		%\bigskip		
+	\end{center}
+	\vfill
+	
+	\noindent
+	\begin{tabular*}{\textwidth}{l @{\hskip 4cm} l}
+		\textbf{\textquote{К защите допущена}}	& \textbf{Научный руководитель} \\
+		& \\
+		Заведующий кафедрой,		& Доцент ФФ НГУ \\ 
+		д.ф.-м.н., профессор		&  \\ 
+		& \\
+		\uline{Лаврентьев М.М.}/\uline{\hspace{2cm}} & \uline{Иртегов Д.В.}/\uline{\hspace{2cm}} \\ [-1.1ex]
+		\scriptsize (фамилия, И.,О.) \hspace{0.5cm} (подпись, МП) & \scriptsize (фамилия, И.,О.) \hspace{0.5cm} (подпись, МП) \\
+		& \\ 
+		«...»...............20...г.& «...»...............20...г. 			
+		
+	\end{tabular*}
+	\vfill
+	\hfill
+	\begin{minipage}{0.5\textwidth}
+		Дата защиты: «...».............20...г.
+	\end{minipage}
+	
+	\vfill
+	
+	\begin{center}
+		Новосибирск, 2024 г.
+	\end{center}
+\end{titlepage}
+	
+	
+
+\tableofcontents
+
+\pagebreak
+
+\section{Введение}
+
+На ФИТ НГУ на курсе «Цифровые платформы» студентами изучается учебный 8-битный процессор CdM8. Из-за ограничений его архитектуры (8-битное адресное пространство, позволяющее использовать только 256 байт памяти), CdM8 не подходит для реализации на нем сложных проектов. В 2023 году группой студентов 3 курса ФИТ НГУ на основе этого процессора был разработан 16-битный процессор CdM16, имеющий 16-битное адресное пространство и позволяющий реализовывать более сложные проекты. Однако, написание кода на языке ассемблера – трудоемкая задача, значительно увеличивающая время разработки, а реализаций высокоуровневых языков для CdM16 в настоящий момент не существует.
+
+\pagebreak
+\section{Обзор вариантов создания компилятора Си под новую архитектуру}
+\subsection{LLVM/CLANG}
+\subsection{GCC}
+\subsection{TCC}
+\subsection{Свой компилятор}
+
+\pagebreak
+\section{Обзор архитектуры LLVM}
+
+\pagebreak
+\section{Обзор архитектуры CdM16}
+
+\pagebreak
+\section{Реализация бэкенда LLVM для CdM16}
+\subsection{Арифметические операции}
+\subsection{Соглашение о вызовах и стэк}
+\subsection{Инструкции условного перехода}
+\subsection{Вызов функций}
+\subsection{Глобальные переменные}
+\subsection{Линковка}
+\subsection{Обработчики прерывний}
+
+\pagebreak
+\section{Заключение}
+\subsection{Планы на будущее}
+
+
+\printbibliography
+\addcontentsline{toc}{section}{\refname}
+
+
+
+
+	
+\end{document}

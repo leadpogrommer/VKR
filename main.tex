@@ -19,6 +19,7 @@
 \usepackage{mathtools}
 \usepackage{cmap}
 \usepackage{array}
+\usepackage{listings}
 
 \renewcommand{\baselinestretch}{1.2}
 \newtheorem*{definition}{Опр}
@@ -57,7 +58,7 @@
 %\renewcommand*{\postnotedelim}{\addcolon\space}
 
 
-\title{Эффективная генерация кода для платформы ARM32}
+\title{Разработка бэкенда LLVM для процессора CDM16}
 \author{}
 \date{}
 
@@ -106,7 +107,7 @@
 	
 	\noindent
 	\begin{tabular*}{\textwidth}{l @{\hskip 4cm} l}
-		\textbf{\textquote{К защите допущена}}	& \textbf{Научный руководитель} \\
+		\textbf{\textquote{К защите допущен}}	& \textbf{Научный руководитель} \\
 		& \\
 		Заведующий кафедрой,		& Доцент ФФ НГУ \\ 
 		д.ф.-м.н., профессор		&  \\ 
@@ -402,9 +403,9 @@ $\phi$-нода. Инструкции move и безусловные перех�
 	\end{center}
 \end{figure}
 
-В результате код вида \mintinline{c}|int f(int a){return a > 15 ? 1337 : 228;}| компилируется в
+\begin{listing}[h!]
 \begin{minted}{asm}
-f>
+f:
 # %bb.0: (HeadBB)
 movens	r0, r1
 ldi	r0, 1337
@@ -416,9 +417,13 @@ ldi	r0, 228
 __LBB0_2: # (TailBB)
 rts
 \end{minted}
-
+\caption{Результат компиляции \mintinline{c}|int f(int a){return a > 15 ? 1337 : 228;}| }
+\end{listing}
 
 \subsection{Линковка}
+
+
+
 \subsection{Обработчики прерываний}
 
 \pagebreak

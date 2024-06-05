@@ -46,3 +46,9 @@
 .mtc
 build/
 _minted*
+final_email
+*.docx
+*.ptc
+!annotation.pdf
+!title.pdf
+!assignment.pdf

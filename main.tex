@@ -84,78 +84,12 @@
 \DeclareCaptionLabelSeparator{longdash}{ -- }
 \captionsetup{labelsep=longdash}
 
-
+\usepackage{pdfpages}
 
 
 \begin{document}
-	\begin{titlepage}
-	\begin{center}	
-		\footnotesize
-		МИНИСТЕРСТВО ОБРАЗОВАНИЯ И НАУКИ РОССИЙСКОЙ ФЕДЕРАЦИИ 
-		
-		ФЕДЕРАЛЬНОЕ ГОСУДАРСТВЕННОЕ АВТОНОМНОЕ ОБРАЗОВАТЕЛЬНОЕ УЧРЕЖДЕНИЕ
-		ВЫСШЕГО ОБРАЗОВАНИЯ
-		
-		«НОВОСИБИРСКИЙ НАЦИОНАЛЬНЫЙ ИССЛЕДОВАТЕЛЬСКИЙ ГОСУДАРСТВЕННЫЙ УНИВЕРСИТЕТ»
-		
-		(НОВОСИБИРСКИЙ ГОСУДАРСТВЕННЫЙ УНИВЕРСИТЕТ, НГУ)
-		\vspace{0.25cm}
-	\end{center}	
-	\normalsize
-	
-	\noindent
-	\begin{tabular}{l @{\hskip 1cm} l}
-		Факультет &Информационных технологий \\
-		Кафедра   &Систем информатики 
-	\end{tabular}
-	
-	\vspace{0.5cm}
-	
-	\noindent
-	\hskip 0.2cm Направление подготовки \hskip 0.3cm 09.03.01 Компьютерные науки и системотехника
-	
-	\vfill		
-	
-	\begin{center}
-		\small	
-		\textbf{ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА БАКАЛАВРА}\\[4mm]
-		\normalsize
-		\uline{\hfill  Мерзляков Илья Алексеевич \hfill} 
-		
-		
-		\normalsize
-		Тема работы: 
-		Разработка бэкенда LLVM для процессора CDM16
-		%\bigskip		
-	\end{center}
-	\vfill
-	
-	\noindent
-	\begin{tabular*}{\textwidth}{l @{\hskip 4cm} l}
-		\textbf{\textquote{К защите допущен}}	& \textbf{Научный руководитель} \\
-		& \\
-		Заведующий кафедрой,		& б/с, доцент КафФТИ ФФ НГУ \\ 
-		д.ф.-м.н., профессор		&  \\ 
-		& \\
-		\uline{Лаврентьев М.М.}/\uline{\hspace{2cm}} & \uline{Иртегов Д.В.}/\uline{\hspace{2cm}} \\ [-1.1ex]
-		\scriptsize (фамилия, И.,О.) \hspace{0.5cm} (подпись, МП) & \scriptsize (фамилия, И.,О.) \hspace{0.5cm} (подпись, МП) \\
-		& \\ 
-		«...»...............20...г.& «...»...............20...г. 			
-		
-	\end{tabular*}
-	\vfill
-	\hfill
-	\begin{minipage}{0.5\textwidth}
-		Дата защиты: «...».............20...г.
-	\end{minipage}
-	
-	\vfill
-	
-	\begin{center}
-		Новосибирск, 2024 г.
-	\end{center}
-\end{titlepage}
-	
+\includepdf[pages=-]{title.pdf}
+\includepdf[pages=-]{assignment.pdf}
 	
 \setcounter{page}{3}
 
